@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /*
@@ -22,41 +23,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/generate-api-token', function (Request $request) {
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+    // Hardcoded user data (for testing only)
+    $user = [
+        'id' => 1,
+        'email' => 'test@example.com',
+        // Add other user attributes as needed
+    ];
 
-    $user = \App\Models\User::where('email', $request->input('email'))->first();
-
-    if (!$user || !Hash::check($request->input('password'), $user->password)) {
-        throw ValidationException::withMessages([
-            'email' => ['The provided credentials are incorrect.'],
-        ]);
-    }
-
-    $token = $user->createToken('api-token')->plainTextToken;
+    // Simulate token generation (replace with your actual token generation logic)
+    $token = Str::random(60); // Generate a random string as a token
 
     return response()->json(['token' => $token]);
-});
-
-// New POST route for saving messages
-Route::post('/save-message', function (Request $request) {
-    // Validate incoming request data
-    $request->validate([
-        'name' => 'required|string',
-        'subject' => 'required|string',
-        'message' => 'required|string',
-    ]);
-
-    // Insert data into the 'messages' table
-    $savedId = DB::table('messages')->insertGetId([
-        'name' => 'John Doe',  // Hardcoded name
-        'subject' => 'Test Subject',  // Hardcoded subject
-        'message' => 'This is a test message.',  // Hardcoded message
-    ]);
-
-    return response()->json(['saved_id' => $savedId], 201);
 });
 
 // Corrected placement of the get-messages route
